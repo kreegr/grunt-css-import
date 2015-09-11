@@ -1,7 +1,7 @@
 var IMPORT_REG = /@import\s+[^;\n]+;/g;
 var PATH_REG = /@import\s+['"](.*)['"]/;
-var PATH_REG_WITH_URL = /@import\s+url\s*\(\s*['"](.*)['"]\s*\)/;
-var BACKGROUND_REG = /(background[^;\}]+)url\s*\(['"]?([^\)'"]*)['"]?\)([^;\n]*)[;\}]/g;
+var PATH_REG_WITH_URL = /@import\s+url\s*\(\s*['"]?(.*?)['"]?\s*\)/;
+var URL_REG = /url\s*\(['"]?([^\)'"]*)['"]?\)/g;
 
 /**
  * 分析出文件内的@import指令引入的css路径(这里直处理的相对路径的)
@@ -74,11 +74,11 @@ function isBase64DataUrl(url) {
  * @returns {XML|string|void|*}
  */
 function replaceExtraResourcesPath(content, srcFilePath) {
-    return content.replace(BACKGROUND_REG, function(all, pre, url, sub) {
+    return content.replace(URL_REG, function(full, url) {
         if (!isBase64DataUrl(url) && isRelativeUrl(url)) {
             url = fetchImportPath(srcFilePath, url);
         }
-        return pre + 'url(\'' + url + '\')' + sub + ';';
+        return 'url(\'' + url + '\')';
     });
 }
 
